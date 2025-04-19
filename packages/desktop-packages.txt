@@ -1,0 +1,50 @@
+# Графические пакеты
+xorg
+xorg-xinit
+xorg-server
+xorg-drivers
+
+# XFCE окружение
+xfce4
+xfce4-goodies
+lightdm
+lightdm-gtk-greeter
+lightdm-gtk-greeter-settings
+network-manager-applet
+thunar-archive-plugin
+thunar-media-tags-plugin
+xfce4-battery-plugin
+xfce4-clipman-plugin
+xfce4-datetime-plugin
+xfce4-mount-plugin
+xfce4-notifyd
+xfce4-pulseaudio-plugin
+xfce4-screenshooter
+xfce4-taskmanager
+xfce4-wavelan-plugin
+xfce4-weather-plugin
+xfce4-whiskermenu-plugin
+
+# Шрифты
+ttf-dejavu
+ttf-liberation
+ttf-droid
+ttf-roboto
+noto-fonts
+noto-fonts-emoji
+
+# Мультимедиа
+pulseaudio
+pavucontrol
+gstreamer
+vlc
+ffmpeg
+
+# Приложения
+firefox
+pcmanfm
+terminator
+leafpad
+galculator
+gimp
+evince 

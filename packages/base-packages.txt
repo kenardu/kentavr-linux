@@ -1,0 +1,32 @@
+# Базовые пакеты
+base
+base-devel
+linux
+linux-firmware
+archlinux-keyring
+
+# Системные пакеты
+sudo
+parted
+gptfdisk
+dosfstools
+e2fsprogs
+grub
+efibootmgr
+networkmanager
+wireless_tools
+wpa_supplicant
+dhcpcd
+nano
+vim
+dialog
+bash-completion
+
+# Архивация и утилиты
+zip
+unzip
+p7zip
+lzop
+unrar
+rsync
+git 

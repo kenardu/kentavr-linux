@@ -1,0 +1,22 @@
+# Временные файлы
+work/
+out/
+*.iso
+*.log
+*.tmp
+
+# Кэш
+__pycache__/
+*.py[cod]
+*.class
+
+# Файлы окружения
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Системные файлы
+.DS_Store
+Thumbs.db
