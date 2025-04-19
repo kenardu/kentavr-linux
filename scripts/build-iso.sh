@@ -57,33 +57,38 @@ mkdir -p "$WORK_DIR" "$OUT_DIR"
 
 # Копирование профиля archiso
 print_message "Подготовка профиля ISO..."
-cp -r /usr/share/archiso/configs/releng/* "$ISO_DIR/"
+mkdir -p "$WORK_DIR/profile"
+cp -r /usr/share/archiso/configs/releng/* "$WORK_DIR/profile/"
 
 # Копирование наших настроек
-cp -f "$PROJECT_DIR/iso/profiledef.sh" "$ISO_DIR/"
-cp -f "$PROJECT_DIR/iso/pacman.conf" "$ISO_DIR/"
+cp "$ISO_DIR/profiledef.sh" "$WORK_DIR/profile/"
+cp "$ISO_DIR/pacman.conf" "$WORK_DIR/profile/"
 
 # Копирование скрипта установки
-mkdir -p "$ISO_DIR/airootfs/usr/local/bin/"
-cp "$PROJECT_DIR/installer/kentavr-install.sh" "$ISO_DIR/airootfs/usr/local/bin/"
-chmod +x "$ISO_DIR/airootfs/usr/local/bin/kentavr-install.sh"
+mkdir -p "$WORK_DIR/profile/airootfs/usr/local/bin/"
+cp "$PROJECT_DIR/installer/kentavr-install.sh" "$WORK_DIR/profile/airootfs/usr/local/bin/"
+chmod +x "$WORK_DIR/profile/airootfs/usr/local/bin/kentavr-install.sh"
 
 # Создание пакетов (если необходимо)
 # TODO: Добавить сборку пакетов
 
 # Создание ISO-образа
 print_message "Создание ISO-образа..."
-cd "$ISO_DIR"
-mkdir -p "$ISO_DIR/airootfs/etc/skel"
+cd "$WORK_DIR/profile"
+mkdir -p "$WORK_DIR/profile/airootfs/etc/skel"
 
 # Создаем список пакетов
-cat > "$ISO_DIR/packages.x86_64" << EOF
+cat > "$WORK_DIR/profile/packages.x86_64" << EOF
 # Базовые пакеты
 base
 base-devel
 linux
 linux-firmware
 archlinux-keyring
+syslinux
+memtest86+
+edk2-shell
+memtest86+-efi
 
 # Системные инструменты
 sudo
@@ -118,15 +123,16 @@ terminator
 EOF
 
 # Настройка пользователя live системы
-mkdir -p "$ISO_DIR/airootfs/etc/"
-cat > "$ISO_DIR/airootfs/etc/systemd/system/getty@tty1.service.d/autologin.conf" << EOF
+mkdir -p "$WORK_DIR/profile/airootfs/etc/systemd/system/getty@tty1.service.d/"
+cat > "$WORK_DIR/profile/airootfs/etc/systemd/system/getty@tty1.service.d/autologin.conf" << EOF
 [Service]
 ExecStart=
 ExecStart=-/sbin/agetty --autologin root --noclear %I 38400 linux
 EOF
 
 # Создаем скрипт для автоматического запуска
-cat > "$ISO_DIR/airootfs/root/.automated_script.sh" << EOF
+mkdir -p "$WORK_DIR/profile/airootfs/root"
+cat > "$WORK_DIR/profile/airootfs/root/.automated_script.sh" << EOF
 #!/bin/bash
 # Автоматический запуск
 # Запуск установщика Kentavr Linux в интерактивном режиме
@@ -137,22 +143,27 @@ else
     echo "Для запуска установщика позже выполните: sudo kentavr-install.sh"
 fi
 EOF
-chmod +x "$ISO_DIR/airootfs/root/.automated_script.sh"
+chmod +x "$WORK_DIR/profile/airootfs/root/.automated_script.sh"
 
 # Настройка графического входа
-mkdir -p "$ISO_DIR/airootfs/etc/lightdm"
-cat > "$ISO_DIR/airootfs/etc/lightdm/lightdm.conf" << EOF
+mkdir -p "$WORK_DIR/profile/airootfs/etc/lightdm"
+cat > "$WORK_DIR/profile/airootfs/etc/lightdm/lightdm.conf" << EOF
 [LightDM]
 greeter-session=lightdm-gtk-greeter
 EOF
 
 # Настройка окружения рабочего стола
-mkdir -p "$ISO_DIR/airootfs/etc/skel/.config"
-echo "exec startxfce4" > "$ISO_DIR/airootfs/etc/skel/.xinitrc"
+mkdir -p "$WORK_DIR/profile/airootfs/etc/skel/.config"
+echo "exec startxfce4" > "$WORK_DIR/profile/airootfs/etc/skel/.xinitrc"
+
+# Копирование конфигурационных файлов из нашего iso/airootfs в рабочий профиль
+if [ -d "$ISO_DIR/airootfs" ]; then
+    cp -r "$ISO_DIR/airootfs/"* "$WORK_DIR/profile/airootfs/"
+fi
 
 # Сборка ISO
 print_message "Сборка ISO образа..."
-mkarchiso -v -w "$WORK_DIR" -o "$OUT_DIR" "$ISO_DIR"
+mkarchiso -v -w "$WORK_DIR" -o "$OUT_DIR" "$WORK_DIR/profile"
 
 print_success "ISO-образ успешно создан!"
 print_message "Путь к образу: $OUT_DIR/kentavr-$(date +%Y.%m.%d)-x86_64.iso"
